@@ -643,6 +643,7 @@ static void send_message_event_cb(lv_event_t * e) {
     close(sock);
 }
 
+//创建第一个页面
 static void profile_create(lv_obj_t * parent) {
     lv_obj_t * panel1 = lv_obj_create(parent);
     lv_obj_set_height(panel1, LV_SIZE_CONTENT);
@@ -680,6 +681,38 @@ static void profile_create(lv_obj_t * parent) {
     // 更新按钮位置
     lv_event_send(cont, LV_EVENT_SCROLL, NULL);
     lv_obj_scroll_to_view(lv_obj_get_child(cont, 0), LV_ANIM_OFF);
+
+//界面添加日历组件
+    lv_obj_t  * calendar = lv_calendar_create(lv_scr_act());
+    lv_obj_set_size(calendar, 185, 185);
+    lv_obj_align(calendar, LV_ALIGN_CENTER, 0, 27);
+    lv_obj_add_event_cb(calendar, event_handler, LV_EVENT_ALL, NULL);
+
+    lv_calendar_set_today_date(calendar, 2021, 02, 23);
+    lv_calendar_set_showed_date(calendar, 2021, 02);
+
+    /*Highlight a few days*/
+    static lv_calendar_date_t highlighted_days[3];       /*Only its pointer will be saved so should be static*/
+    highlighted_days[0].year = 2021;
+    highlighted_days[0].month = 02;
+    highlighted_days[0].day = 6;
+
+    highlighted_days[1].year = 2021;
+    highlighted_days[1].month = 02;
+    highlighted_days[1].day = 11;
+
+    highlighted_days[2].year = 2022;
+    highlighted_days[2].month = 02;
+    highlighted_days[2].day = 22;
+
+    lv_calendar_set_highlighted_dates(calendar, highlighted_days, 3);
+
+#if LV_USE_CALENDAR_HEADER_DROPDOWN
+    lv_calendar_header_dropdown_create(calendar);
+#elif LV_USE_CALENDAR_HEADER_ARROW
+    lv_calendar_header_arrow_create(calendar);
+#endif
+    lv_calendar_set_showed_date(calendar, 2021, 10);
 
     // 创建包含输入框和发送按钮的容器
     lv_obj_t * input_container = lv_obj_create(panel1);
@@ -755,6 +788,19 @@ static void scroll_event_cb(lv_event_t * e)
     }
 }
 
+//添加日历组件
+static void event_handler(lv_event_t * e)
+{
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t * obj = lv_event_get_current_target(e);
+
+    if(code == LV_EVENT_VALUE_CHANGED) {
+        lv_calendar_date_t date;
+        if(lv_calendar_get_pressed_date(obj, &date)) {
+            LV_LOG_USER("Clicked date: %02d.%02d.%d", date.day, date.month, date.year);
+        }
+    }
+}
 
 static void analytics_create(lv_obj_t * parent)
 {
