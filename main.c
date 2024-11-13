@@ -5,16 +5,18 @@
 #include <unistd.h>
 #include <time.h>
 #include <sys/time.h>
+#include "lv_lib_png/lv_png.h"
 
 #define DISP_BUF_SIZE (1024 * 600)
 
 /* 仅声明图标，不要包含 mouse_cursor_icon.c */
-LV_IMG_DECLARE(mouse_cursor_icon);  
+//LV_IMG_DECLARE(mouse_cursor_icon);  
 
 int main(void)
 {
     lv_init();
-
+    
+    lv_png_init();
     /* Linux frame buffer device init */
     fbdev_init();
 
@@ -45,9 +47,9 @@ int main(void)
     lv_indev_t * my_indev = lv_indev_drv_register(&indev_drv); 
 
     /* Create a cursor object (a small circle) */
-    lv_obj_t * cursor_obj = lv_img_create(lv_scr_act()); /* Create an image object for the cursor */
-    lv_img_set_src(cursor_obj, &mouse_cursor_icon); /* Set the cursor image */
-    lv_indev_set_cursor(my_indev, cursor_obj); /* Link the cursor object to the input device */
+    // lv_obj_t * cursor_obj = lv_img_create(lv_scr_act()); /* Create an image object for the cursor */
+    // lv_img_set_src(cursor_obj, &mouse_cursor_icon); /* Set the cursor image */
+    // lv_indev_set_cursor(my_indev, cursor_obj); /* Link the cursor object to the input device */
 
     /* Create a Demo */
     lv_demo_widgets();

@@ -1,46 +1,55 @@
-#
+# 
 # Makefile
 #
-#CC 				?= gcc
+#CC                 ?= gcc
 CC = aarch64-none-linux-gnu-gcc
-LVGL_DIR_NAME 	?= lvgl
-LVGL_DIR 		?= .
+LVGL_DIR_NAME     ?= lvgl
+LVGL_DIR          ?= .
 
-WARNINGS		:= -Wall -Wshadow -Wundef -Wmissing-prototypes -Wno-discarded-qualifiers -Wall -Wextra -Wno-unused-function -Wno-error=strict-prototypes -Wpointer-arith \
-					-fno-strict-aliasing -Wno-error=cpp -Wuninitialized -Wmaybe-uninitialized -Wno-unused-parameter -Wno-missing-field-initializers -Wtype-limits -Wsizeof-pointer-memaccess \
-					-Wno-format-nonliteral -Wno-cast-qual -Wunreachable-code -Wno-switch-default -Wreturn-type -Wmultichar -Wformat-security -Wno-ignored-qualifiers -Wno-error=pedantic \
-					-Wno-sign-compare -Wno-error=missing-prototypes -Wdouble-promotion -Wclobbered -Wdeprecated -Wempty-body -Wtype-limits -Wshift-negative-value -Wstack-usage=2048 \
-					-Wno-unused-value -Wno-unused-parameter -Wno-missing-field-initializers -Wuninitialized -Wmaybe-uninitialized -Wall -Wextra -Wno-unused-parameter \
-					-Wno-missing-field-initializers -Wtype-limits -Wsizeof-pointer-memaccess -Wno-format-nonliteral -Wpointer-arith -Wno-cast-qual -Wmissing-prototypes \
-					-Wunreachable-code -Wno-switch-default -Wreturn-type -Wmultichar -Wno-discarded-qualifiers -Wformat-security -Wno-ignored-qualifiers -Wno-sign-compare -std=c99
-CFLAGS 			?= -O3 -g0 -I$(LVGL_DIR)/ $(WARNINGS)
-LDFLAGS 		?= -lm
-BIN 			= demo_new
-BUILD_DIR 		= ./build
-BUILD_OBJ_DIR 	= $(BUILD_DIR)/obj
-BUILD_BIN_DIR 	= $(BUILD_DIR)/bin
+WARNINGS          := -Wall -Wshadow -Wundef -Wmissing-prototypes -Wno-discarded-qualifiers -Wall -Wextra -Wno-unused-function -Wno-error=strict-prototypes -Wpointer-arith \
+                     -fno-strict-aliasing -Wno-error=cpp -Wuninitialized -Wmaybe-uninitialized -Wno-unused-parameter -Wno-missing-field-initializers -Wtype-limits -Wsizeof-pointer-memaccess \
+                     -Wno-format-nonliteral -Wno-cast-qual -Wunreachable-code -Wno-switch-default -Wreturn-type -Wmultichar -Wformat-security -Wno-ignored-qualifiers -Wno-error=pedantic \
+                     -Wno-sign-compare -Wno-error=missing-prototypes -Wdouble-promotion -Wclobbered -Wdeprecated -Wempty-body -Wtype-limits -Wshift-negative-value -Wstack-usage=2048 \
+                     -Wno-unused-value -Wno-unused-parameter -Wno-missing-field-initializers -Wuninitialized -Wmaybe-uninitialized -Wall -Wextra -Wno-unused-parameter \
+                     -Wno-missing-field-initializers -Wtype-limits -Wsizeof-pointer-memaccess -Wno-format-nonliteral -Wpointer-arith -Wno-cast-qual -Wmissing-prototypes \
+                     -Wunreachable-code -Wno-switch-default -Wreturn-type -Wmultichar -Wno-discarded-qualifiers -Wformat-security -Wno-ignored-qualifiers -Wno-sign-compare -std=c99
+CFLAGS            ?= -O3 -g0 -I$(LVGL_DIR)/ $(WARNINGS)
 
-prefix 			?= /usr
-bindir 			?= $(prefix)/bin
+# 添加 lv_lib_png 的包含路径
+CFLAGS += -I./lv_lib_png
 
-#Collect the files to compile
-MAINSRC = 		./main.c
+LDFLAGS           ?= -lm
+BIN               = demo_new
+BUILD_DIR         = ./build
+BUILD_OBJ_DIR     = $(BUILD_DIR)/obj
+BUILD_BIN_DIR     = $(BUILD_DIR)/bin
+
+prefix            ?= /usr
+bindir            ?= $(prefix)/bin
+
+# Collect the files to compile
+MAINSRC =         ./main.c
+
+# 添加 background.c 和 lv_lib_png 的源文件路径
+#SRCS += ./background.c
+
+SRCS += ./lv_lib_png/lv_png.c
 
 include $(LVGL_DIR)/lvgl/lvgl.mk
 include $(LVGL_DIR)/lv_drivers/lv_drivers.mk
 
-CSRCS += mouse_cursor_icon.c
+# CSRCS += mouse_cursor_icon.c
 
-OBJEXT 			?= .o
+OBJEXT           ?= .o
 
-AOBJS 			= $(ASRCS:.S=$(OBJEXT))
-COBJS 			= $(CSRCS:.c=$(OBJEXT))
+AOBJS            = $(ASRCS:.S=$(OBJEXT))
+COBJS            = $(CSRCS:.c=$(OBJEXT))
 
-MAINOBJ 		= $(MAINSRC:.c=$(OBJEXT))
+MAINOBJ          = $(MAINSRC:.c=$(OBJEXT))
 
-SRCS 			= $(ASRCS) $(CSRCS) $(MAINSRC)
-OBJS 			= $(AOBJS) $(COBJS) $(MAINOBJ)
-TARGET 			= $(addprefix $(BUILD_OBJ_DIR)/, $(patsubst ./%, %, $(OBJS)))
+SRCS             = $(ASRCS) $(CSRCS) $(MAINSRC)
+OBJS             = $(AOBJS) $(COBJS) $(MAINOBJ)
+TARGET           = $(addprefix $(BUILD_OBJ_DIR)/, $(patsubst ./%, %, $(OBJS)))
 
 ## MAINOBJ -> OBJFILES
 

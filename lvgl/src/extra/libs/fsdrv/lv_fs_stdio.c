@@ -18,6 +18,11 @@
     #include <windows.h>
 #endif
 
+// 如果没有定义 DT_DIR，手动定义它
+#ifndef DT_DIR
+    #define DT_DIR 4  // 通常 DT_DIR 的值为 4
+#endif
+
 /*********************
  *      DEFINES
  *********************/
