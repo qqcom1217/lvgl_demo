@@ -19,6 +19,7 @@
 ## 部署流程
 
 ### LVGL 部署
+
 - **LVGL 版本**：LVGL v8.3.11
 - **编程环境**：Windows 11 + VS Code
 - **编译环境**：Ubuntu 20.04 (交叉编译)
@@ -33,61 +34,66 @@
    - 或者直接下载本工程的完整代码
 
 #### 2. 创建工程
-   - 创建一个名为 `lvgl_project` 的文件夹
-   - 将下载的 `lvgl` 和 `lv_drivers` 文件夹复制到 `lvgl_project` 中
-   - 将 `lv_port_linux_frame_buffer` 文件夹中的 `main.c` 和 `Makefile` 文件复制到 `lvgl_project` 中
-   - 将 `lvgl` 文件夹中的 `lv_conf_template.h` 文件复制到 `lvgl_project` 并改名为 `lv_conf.h`
-   - 将 `lv_drivers` 文件夹中的 `lv_drv_conf_template.h` 文件复制到 `lvgl_project` 并改名为 `lv_drv_conf.h`
-   
+
+   1. 创建一个名为 `lvgl_project` 的文件夹。
+   2. 将下载的 `lvgl` 和 `lv_drivers` 文件夹复制到 `lvgl_project` 中。
+   3. 将 `lv_port_linux_frame_buffer` 文件夹中的 `main.c` 和 `Makefile` 文件复制到 `lvgl_project` 中。
+   4. 将 `lvgl` 文件夹中的 `lv_conf_template.h` 文件复制到 `lvgl_project` 并改名为 `lv_conf.h`。
+   5. 将 `lv_drivers` 文件夹中的 `lv_drv_conf_template.h` 文件复制到 `lvgl_project` 并改名为 `lv_drv_conf.h`。
+
    > **注**：`lv_conf_template.h` 和 `lv_drv_conf_template.h` 为模板文件，后续若 LVGL 配置出现问题，可以重新替换这些模板文件。
 
 #### 3. 修改配置文件
 
 ##### 修改 `lv_drv_conf.h`
 
-将 `#if 0` 改为 `#if 1`：
+- 将 `#if 0` 改为 `#if 1`：
+  
+  ![图片描述](assets/lv_drv_con.png)
 
-   ![图片描述](assets/lv_drv_con.png)
+- 将 `USE_FBDEV` 的值改为 `1`，使能 frame buffer 设备：
+  
+  ![图片描述](assets/fbdev.png)
+  
+- 将 `USE_EVDEV` 的值改为 `1`，配置触控输入设备的文件路径：
 
-将 USE_FBDEV 的值改为 1，使能 frame buffer 设备:
-
-   ![图片描述](assets/fbdev.png)
-   
-将 USE_EVDEV 的值改为 1，配置触控输入设备的文件路径：
-
-   ![图片描述](assets/USE_EVDEV.png)
-   
+  ![图片描述](assets/USE_EVDEV.png)
+  
 ##### 修改 `lv_conf.h`
 
-将 #if 0 改成 #if 1：
+- 将 `#if 0` 改为 `#if 1`：
+  
+  ![图片描述](assets/lv_conf.png)
+  
+- 根据实际情况适当扩大内存配置：
 
-   ![图片描述](assets/lv_conf.png)
-   
-根据实际情况适当扩大内存：
+  ![图片描述](assets/mem.png)
+  
+- 这里可以修改刷新频率，默认为 30ms：
 
-   ![图片描述](assets/mem.png)
-   
-这里可以修改刷新频率，默认为 30ms：
+  ![图片描述](assets/MS.png)
+  
+- 配置 Tick：
 
-   ![图片描述](assets/MS.png)
-   
-配置 Tick：
+  ![图片描述](assets/tick.png)
+  
+- 使能 widgets demo：
 
-   ![图片描述](assets/tick.png)
-   
-使能 widgets demo：
+  ![图片描述](assets/use_demo.png)
 
-   ![图片描述](assets/use_demo.png)
-   
 ##### 修改 `Makefile`
-指定编译器，因为我在编译前会设置编译器环境变量，为避免错误，此处注释掉该配置，使用环境下默认编译器：
-如果未配置交叉编译环境参照这份教程
 
-- [配置交叉编译环境](https://blog.csdn.net/m0_53809203/article/details/134236670)
-- [清华大学开源软件镜像站](https://mirrors.tuna.tsinghua.edu.cn/armbian-releases/_toolchain/?C=N&O=A)
-  
-   ![图片描述](assets/gcc.png)
-  
-添加 lv_drivers.mk，注释掉鼠标样式源文件：
-   ![图片描述](assets/mk.png)
+- 指定编译器：若编译前已设置编译器环境变量，为避免错误，此处可以注释掉配置项并使用环境下的默认编译器。
+
+  - 如未配置交叉编译环境，可参考以下资源：
+     - [配置交叉编译环境](https://blog.csdn.net/m0_53809203/article/details/134236670)
+     - [清华大学开源软件镜像站](https://mirrors.tuna.tsinghua.edu.cn/armbian-releases/_toolchain/?C=N&O=A)
+
+  ![图片描述](assets/gcc.png)
+
+- 添加 `lv_drivers.mk`，并注释掉鼠标样式源文件：
+
+  ![图片描述](assets/mk.png)
+
+---
 
