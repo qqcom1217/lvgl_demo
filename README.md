@@ -115,3 +115,10 @@
 - [Snowboy语音唤醒功能](https://blog.csdn.net/crimaster1024/article/details/136821662)
 
 ### Snowboy语音唤醒功能部署结束
+
+### sherpa-onnx语音识别与合成功能部署
+
+#### 参照下面链接
+
+- [sherpa-onnx语音识别功能部署](https://blog.csdn.net/anshichuxuezhe/article/details/132151456)
+- [sherpa-onnx github](https://github.com/k2-fsa/sherpa-onnx)
