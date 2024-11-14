@@ -45,7 +45,24 @@
 
 ##### 修改 `lv_drv_conf.h`
 
-找到以下代码，将 `#if 0` 改为 `#if 1`：
+将 `#if 0` 改为 `#if 1`：
 
-![图片描述](assets/filename.png)
+   ![图片描述](assets/filename.png)
 
+将 USE_FBDEV 的值改为 1，使能 frame buffer 设备:
+
+将 USE_EVDEV 的值改为 1，配置触控输入设备的文件路径：
+
+##### 修改 `lv_conf.h`
+
+将 #if 0 改成 #if 1：
+   
+根据实际情况适当扩大内存：
+
+这里可以修改刷新频率，默认为 30ms：
+
+配置 Tick：
+
+使能 widgets demo：
+
+##### 修改 `Makefile`
