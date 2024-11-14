@@ -107,3 +107,11 @@
 - [讯飞星火大模型接入](https://github.com/iflytek/spark-ai-python)
 
 ### 星火大模型部署结束
+
+### Snowboy语音唤醒功能部署
+
+#### 参照下面链接
+
+- [Snowboy语音唤醒功能](https://blog.csdn.net/crimaster1024/article/details/136821662)
+
+### Snowboy语音唤醒功能部署结束
