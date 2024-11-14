@@ -1,4 +1,4 @@
-# 基于LVGL与嵌入式系统的AI助手
+# 基于LVGL与嵌入式系统的AI助手(未完成)
 
 ## 项目简介
 这是一个基于 Orange Pi 的嵌入式智能语音助手系统，集成了 GPT 人工智能聊天功能、音乐播放和多媒体交互等功能。
@@ -18,6 +18,5 @@
 ## 安装与运行
 ### 环境配置
 1. 克隆项目仓库：
-   ```bash
-   git clone https://github.com/your-username/project-name.git
-   cd project-name
+   
+
