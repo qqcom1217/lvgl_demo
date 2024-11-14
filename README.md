@@ -56,6 +56,7 @@
   ![图片描述](assets/fbdev.png)
   
 - 将 `USE_EVDEV` 的值改为 `1`，配置触控输入设备的文件路径：
+   - 可使用evtest指令查看当前的触摸设备修改配置
 
   ![图片描述](assets/USE_EVDEV.png)
   
@@ -91,9 +92,10 @@
 
   ![图片描述](assets/gcc.png)
 
-- 添加 `lv_drivers.mk`，并注释掉鼠标样式源文件：
+- 添加 `lv_drivers.mk`，并注释掉鼠标样式源文件（如果后面需要使用鼠标需在文件夹中添加mouse_cursor_icon.c文件）：
 
   ![图片描述](assets/mk.png)
 
----
+##### 在lvgl_project文件夹下执行`make`指令编译代码生成可执行文件
+### LVGL 部署过程结束
 
