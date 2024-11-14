@@ -35,7 +35,7 @@
    - 注：上面lv_conf_template.h和lv_drv_conf_template.h两个文件为模板文件，后续如果LVGL配置出现问题可直接替换重新配置
 3.  修改配置
    - 修改lv_drv_conf.h
-        - 将 #if 0 改成 #if 1：
+        #### 将 #if 0 改成 #if 1：
         - 
    
 
