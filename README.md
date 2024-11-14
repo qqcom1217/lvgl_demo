@@ -84,8 +84,10 @@
 如果未配置交叉编译环境参照这份教程
 
 - [配置交叉编译环境](https://blog.csdn.net/m0_53809203/article/details/134236670)
+- [清华大学开源软件镜像站](https://mirrors.tuna.tsinghua.edu.cn/armbian-releases/_toolchain/?C=N&O=A)
   
    ![图片描述](assets/gcc.png)
+  
 添加 lv_drivers.mk，注释掉鼠标样式源文件：
    ![图片描述](assets/mk.png)
 
