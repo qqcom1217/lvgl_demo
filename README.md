@@ -136,7 +136,13 @@
 ### LVGL 部署过程结束
 
 ### 星火大模型部署
+- 前置条件需要在讯飞星火官网申请有权限的
+   - app_id
+   - api_key
+   - api_secret
+- URL/Domain配置请查看doc
 
+- 运行测试脚本需要提前将 .env.example 拷贝为 .env并配置其中变量
 #### 参照下面链接
 
 - [讯飞星火大模型接入](https://github.com/iflytek/spark-ai-python)
