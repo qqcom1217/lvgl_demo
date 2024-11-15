@@ -107,7 +107,7 @@
     - [LVGL图像在线转换](https://lvgl.io/tools/imageconverter)
     - 如何使用转换后的c数组
       - 可以参照lvgl文件夹下`examples/libs/gif`文件夹下demo的使用方式
-      - 下面是我自己参照demo后修改的`gif.c`文件
+      - 下面是参照demo后修改的`gif.c`文件
            ```bash
                #include "../../lv_examples.h"
                #if LV_USE_GIF && LV_BUILD_EXAMPLES
