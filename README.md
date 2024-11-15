@@ -99,9 +99,38 @@
 
 ##### 在lvgl_project文件夹下执行`make`指令编译代码生成可执行文件
 - 在LVGL中显示GIF图像
-     - 在lv_conf.h文件中使能`LV_USE_GIF`
-         ![图片描述](assets/GIF.png)
+    - 在lv_conf.h文件中使能`LV_USE_GIF`
        
+         ![图片描述](assets/GIF.png)
+
+    - 使用LVGL官方给出的图像格式在线转换网站将自己的GIF图像转化为c数组，选择“Raw”颜色格式和“C array”输出格式，该平台同时也支持png图像转换
+    - [LVGL图像在线转换](https://lvgl.io/tools/imageconverter)
+    - 如何使用转换后的c数组
+      - 可以参照lvgl文件夹下`examples/libs/gif`文件夹下demo的使用方式
+      - 下面是我自己参照demo后修改的`gif.c`文件
+           ```bash
+               #include "../../lv_examples.h"
+               #if LV_USE_GIF && LV_BUILD_EXAMPLES
+
+               lv_obj_t* gif_1(void) {
+                   LV_IMG_DECLARE(SS); // 确保这里引用的是有效的 GIF 图像数据
+                   lv_obj_t* img = lv_gif_create(lv_scr_act());
+
+                   // 设置 GIF 源
+                   lv_gif_set_src(img, &SS);
+                   lv_img_set_zoom(img, 512);  // 设置缩放比例，256 表示 100%，512 表示 200%
+                   lv_obj_align(img, LV_ALIGN_CENTER, 0, 0); // 居中对齐
+
+                   // 确保对象可以接收点击事件
+                   lv_obj_add_flag(img, LV_OBJ_FLAG_CLICKABLE);
+
+                   // 设置背景颜色为白色
+                   lv_obj_set_style_bg_color(img, lv_color_white(), 0); // 设置背景为白色
+                   lv_obj_set_style_bg_opa(img, LV_OPA_COVER, 0);       // 设置背景不透明度
+
+                   return img;
+               }
+           ```
 ### LVGL 部署过程结束
 
 ### 星火大模型部署
