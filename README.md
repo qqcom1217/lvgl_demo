@@ -98,6 +98,10 @@
   ![图片描述](assets/mk.png)
 
 ##### 在lvgl_project文件夹下执行`make`指令编译代码生成可执行文件
+- 在LVGL中显示GIF图像
+     - 在lv_conf.h文件中使能`LV_USE_GIF`
+         ![图片描述](assets/GIF.png)
+       
 ### LVGL 部署过程结束
 
 ### 星火大模型部署
