@@ -131,6 +131,8 @@
                    return img;
                }
            ```
+      - LVGL提供了很多组件demo可以根据需求直接添加到自己的UI中具体的介绍和使用方式在下面的链接中
+         - [百问网LVGL中文开发手册](https://lvgl.100ask.net/8.1/index.html)
 ### LVGL 部署过程结束
 
 ### 星火大模型部署
