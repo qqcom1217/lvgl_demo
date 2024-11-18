@@ -18,7 +18,8 @@ CFLAGS            ?= -O3 -g0 -I$(LVGL_DIR)/ $(WARNINGS)
 # 添加 lv_lib_png 的包含路径
 CFLAGS += -I./lv_lib_png
 
-LDFLAGS           ?= -lm
+#LDFLAGS           ?= -lm
+LDFLAGS           ?= -lm -lpthread
 BIN               = demo_new
 BUILD_DIR         = ./build
 BUILD_OBJ_DIR     = $(BUILD_DIR)/obj

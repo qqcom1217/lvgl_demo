@@ -17,7 +17,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define ACTIVE_TRACK_CNT    3
+#define ACTIVE_TRACK_CNT    13
 #define INTRO_TIME          2000
 #define BAR_COLOR1          lv_color_hex(0xe9dbfc)
 #define BAR_COLOR2          lv_color_hex(0x6f8af6)
@@ -42,6 +42,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+static bool is_playing_music = false; // 用于跟踪音乐是否已经在播放
 static lv_obj_t * create_cont(lv_obj_t * parent);
 static void create_wave_images(lv_obj_t * parent);
 static lv_obj_t * create_title_box(lv_obj_t * parent);
@@ -65,6 +66,7 @@ static void spectrum_end_cb(lv_anim_t * a);
 static void album_fade_anim_cb(void * var, int32_t v);
 static int32_t get_cos(int32_t deg, int32_t a);
 static int32_t get_sin(int32_t deg, int32_t a);
+void stop_music();
 
 /**********************
  *  STATIC VARIABLES
@@ -272,7 +274,7 @@ lv_obj_t * _lv_demo_music_main_create(lv_obj_t * parent)
     lv_obj_move_foreground(logo);
 
     lv_obj_t * title = lv_label_create(lv_scr_act());
-    lv_label_set_text(title, "LVGL Demo\nMusic player");
+    lv_label_set_text(title, "QQCOM\nMusic player");
     lv_obj_set_style_text_align(title, LV_TEXT_ALIGN_CENTER, 0);
     lv_obj_set_style_text_font(title, font_large, 0);
     lv_obj_set_style_text_line_space(title, 8, 0);
@@ -597,6 +599,7 @@ static lv_obj_t * create_ctrl_box(lv_obj_t * parent)
 
     LV_IMG_DECLARE(img_lv_demo_music_slider_knob);
     slider_obj = lv_slider_create(cont);
+    lv_obj_add_flag(slider_obj, LV_OBJ_FLAG_HIDDEN); // 隐藏进度条
     lv_obj_set_style_anim_time(slider_obj, 100, 0);
     lv_obj_add_flag(slider_obj, LV_OBJ_FLAG_CLICKABLE); /*No input from the slider*/
 
@@ -616,6 +619,7 @@ static lv_obj_t * create_ctrl_box(lv_obj_t * parent)
     lv_obj_set_style_outline_width(slider_obj, 0, 0);
 
     time_obj = lv_label_create(cont);
+    lv_obj_add_flag(time_obj, LV_OBJ_FLAG_HIDDEN);  // 隐藏时间标签
     lv_obj_set_style_text_font(time_obj, font_small, 0);
     lv_obj_set_style_text_color(time_obj, lv_color_hex(0x8a86b8), 0);
     lv_label_set_text(time_obj, "0:00");
@@ -955,23 +959,42 @@ static void album_gesture_event_cb(lv_event_t * e)
     if(dir == LV_DIR_LEFT) _lv_demo_music_album_next(true);
     if(dir == LV_DIR_RIGHT) _lv_demo_music_album_next(false);
 }
-
+void stop_music() {
+    // 使用系统命令杀掉 mpg123 进程
+    system("pkill -f mpg123");
+}
 static void play_event_click_cb(lv_event_t * e)
 {
     lv_obj_t * obj = lv_event_get_target(e);
     if(lv_obj_has_state(obj, LV_STATE_CHECKED)) {
+        if (!is_playing_music) {
+            // 播放新的音乐
+            const char * file_path = _lv_demo_music_get_file_path(track_id); // 获取当前歌曲路径
+            if (file_path) {
+                play_mp3(file_path);
+                is_playing_music = true; // 更新播放状态
+            }
+        } 
         _lv_demo_music_resume();
     }
     else {
         _lv_demo_music_pause();
+        stop_music();
+        is_playing_music = false; // 更新播放状态
     }
 }
-
 static void prev_click_event_cb(lv_event_t * e)
 {
-    LV_UNUSED(e);
-    _lv_demo_music_album_next(false);
+    lv_event_code_t code = lv_event_get_code(e); // 获取事件代码
+    if(code == LV_EVENT_CLICKED) { // 确认事件为点击事件
+        _lv_demo_music_album_next(false); // 切换到上一首
+    }
 }
+// static void prev_click_event_cb(lv_event_t * e)
+// {
+//     LV_UNUSED(e);
+//     _lv_demo_music_album_next(false);
+// }
 
 static void next_click_event_cb(lv_event_t * e)
 {
@@ -985,25 +1008,38 @@ static void next_click_event_cb(lv_event_t * e)
 static void timer_cb(lv_timer_t * t)
 {
     LV_UNUSED(t);
-    time_act++;
-    lv_label_set_text_fmt(time_obj, "%"LV_PRIu32":%02"LV_PRIu32, time_act / 60, time_act % 60);
-    lv_slider_set_value(slider_obj, time_act, LV_ANIM_ON);
+    // time_act++;
+    // lv_label_set_text_fmt(time_obj, "%"LV_PRIu32":%02"LV_PRIu32, time_act / 60, time_act % 60);
+    // lv_slider_set_value(slider_obj, time_act, LV_ANIM_ON);
 }
 
 static void spectrum_end_cb(lv_anim_t * a)
 {
     LV_UNUSED(a);
-    _lv_demo_music_album_next(true);
+    // _lv_demo_music_album_next(true);
 }
-
 
 static void stop_start_anim_timer_cb(lv_timer_t * t)
 {
     LV_UNUSED(t);
-    start_anim = false;
-    stop_start_anim_timer = NULL;
-    lv_obj_refresh_ext_draw_size(spectrum_obj);
+
+    start_anim = false; // 设置动画停止标志
+
+    if (stop_start_anim_timer) {
+        lv_timer_del(stop_start_anim_timer); // 删除计时器
+        stop_start_anim_timer = NULL;        // 防止后续错误访问
+    }
+
+    // 其他逻辑
+    lv_obj_refresh_ext_draw_size(spectrum_obj); // 刷新对象绘图区域
 }
+// static void stop_start_anim_timer_cb(lv_timer_t * t)
+// {
+//     LV_UNUSED(t);
+//     start_anim = false;
+//     stop_start_anim_timer = NULL;
+//     lv_obj_refresh_ext_draw_size(spectrum_obj);
+// }
 
 static void album_fade_anim_cb(void * var, int32_t v)
 {

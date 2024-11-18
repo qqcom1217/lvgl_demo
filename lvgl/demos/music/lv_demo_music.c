@@ -34,6 +34,31 @@
 static lv_obj_t * ctrl;
 static lv_obj_t * list;
 
+typedef struct {
+    const char * title;      // 歌曲标题
+    const char * artist;     // 艺术家
+    const char * file_path;  // MP3 文件路径
+} music_track_t;
+
+// 示例歌曲数据数组
+music_track_t music_tracks[] = {
+    {"Song 1", "Artist A", "A:1.mp3"},
+    {"Song 2", "Artist B", "A:2.mp3"},
+    {"Song 3", "Artist B", "A:3.mp3"},
+    {"Song 4", "Artist B", "A:4.mp3"},
+    {"Song 5", "Artist B", "A:5.mp3"},
+    {"Song 6", "Artist B", "A:6.mp3"},
+    {"Song 7", "Artist B", "A:7.mp3"},
+    {"Song 8", "Artist B", "A:8.mp3"},
+    {"Song 9", "Artist B", "A:9.mp3"},
+    {"Song 10", "Artist B", "A:10.mp3"},
+    {"Song 11", "Artist B", "A:11.mp3"},
+    {"Song 12", "Artist B", "A:12.mp3"},
+    {"Song 13", "Artist B", "A:13.mp3"},
+    {NULL, NULL, NULL} // 用于标记结束
+};
+
+
 static const char * title_list[] = {
     "Waiting for true love",
     "Need a Better Future",
@@ -87,20 +112,20 @@ static const char * genre_list[] = {
 };
 
 static const uint32_t time_list[] = {
-    1 * 60 + 14,
-    2 * 60 + 26,
-    1 * 60 + 54,
-    2 * 60 + 24,
-    2 * 60 + 37,
-    3 * 60 + 33,
-    1 * 60 + 56,
-    3 * 60 + 31,
-    2 * 60 + 20,
-    2 * 60 + 19,
-    2 * 60 + 20,
-    2 * 60 + 19,
-    2 * 60 + 20,
-    2 * 60 + 19,
+    6 * 60 + 14,
+    6 * 60 + 26,
+    6 * 60 + 54,
+    6 * 60 + 24,
+    6 * 60 + 37,
+    6 * 60 + 33,
+    6 * 60 + 56,
+    6 * 60 + 31,
+    6 * 60 + 20,
+    6 * 60 + 19,
+    6 * 60 + 20,
+    6 * 60 + 19,
+    6 * 60 + 20,
+    6 * 60 + 19,
 };
 
 #if LV_DEMO_MUSIC_AUTO_PLAY
@@ -116,19 +141,37 @@ static lv_color_t original_screen_bg_color;
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-
-void lv_demo_music(void)
+void lv_demo_music(lv_obj_t * parent)
 {
-    original_screen_bg_color = lv_obj_get_style_bg_color(lv_scr_act(), 0);
-    lv_obj_set_style_bg_color(lv_scr_act(), lv_color_hex(0x343247), 0);
+    // 如果 parent 为空，默认为当前屏幕
+    if (!parent) {
+        parent = lv_scr_act();
+    }
 
-    list = _lv_demo_music_list_create(lv_scr_act());
+    // 设置父容器的背景颜色
+    lv_obj_set_style_bg_color(parent, lv_color_hex(0x343247), 0);
+
+    // 在父容器中创建音乐演示的内容
+    list = _lv_demo_music_list_create(parent);
     ctrl = _lv_demo_music_main_create(lv_scr_act());
 
 #if LV_DEMO_MUSIC_AUTO_PLAY
     auto_step_timer = lv_timer_create(auto_step_cb, 1000, NULL);
 #endif
 }
+
+// void lv_demo_music(void)
+// {
+//     original_screen_bg_color = lv_obj_get_style_bg_color(lv_scr_act(), 0);
+//     lv_obj_set_style_bg_color(lv_scr_act(), lv_color_hex(0x343247), 0);
+
+//     list = _lv_demo_music_list_create(lv_scr_act());
+//     ctrl = _lv_demo_music_main_create(lv_scr_act());
+
+// #if LV_DEMO_MUSIC_AUTO_PLAY
+//     auto_step_timer = lv_timer_create(auto_step_cb, 1000, NULL);
+// #endif
+// }
 
 void lv_demo_music_close(void)
 {
@@ -145,18 +188,40 @@ void lv_demo_music_close(void)
 
     lv_obj_set_style_bg_color(lv_scr_act(), original_screen_bg_color, 0);
 }
+const char * _lv_demo_music_get_file_path(uint32_t track_id)
+{
+    if (track_id < sizeof(music_tracks) / sizeof(music_tracks[0]) - 1) {
+        return music_tracks[track_id].file_path;
+    }
+    return NULL;
+}
 
 const char * _lv_demo_music_get_title(uint32_t track_id)
 {
-    if(track_id >= sizeof(title_list) / sizeof(title_list[0])) return NULL;
-    return title_list[track_id];
+    if (track_id < sizeof(music_tracks) / sizeof(music_tracks[0]) - 1) {
+        return music_tracks[track_id].title;
+    }
+    return NULL;
 }
 
+// const char * _lv_demo_music_get_title(uint32_t track_id)
+// {
+//     if(track_id >= sizeof(title_list) / sizeof(title_list[0])) return NULL;
+//     return title_list[track_id];
+// }
 const char * _lv_demo_music_get_artist(uint32_t track_id)
 {
-    if(track_id >= sizeof(artist_list) / sizeof(artist_list[0])) return NULL;
-    return artist_list[track_id];
+    if (track_id < sizeof(music_tracks) / sizeof(music_tracks[0]) - 1) {
+        return music_tracks[track_id].artist;
+    }
+    return NULL;
 }
+
+// const char * _lv_demo_music_get_artist(uint32_t track_id)
+// {
+//     if(track_id >= sizeof(artist_list) / sizeof(artist_list[0])) return NULL;
+//     return artist_list[track_id];
+// }
 
 const char * _lv_demo_music_get_genre(uint32_t track_id)
 {

@@ -10,6 +10,10 @@
 #if LV_USE_DEMO_MUSIC
 
 #include "lv_demo_music_main.h"
+#include <pthread.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
 
 /*********************
  *      DEFINES
@@ -24,7 +28,7 @@
  **********************/
 static lv_obj_t * add_list_btn(lv_obj_t * parent, uint32_t track_id);
 static void btn_click_event_cb(lv_event_t * e);
-
+void play_mp3(const char * file_path);
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -185,9 +189,9 @@ static lv_obj_t * add_list_btn(lv_obj_t * parent, uint32_t track_id)
     lv_obj_add_style(btn, &style_btn_dis, LV_STATE_DISABLED);
     lv_obj_add_event_cb(btn, btn_click_event_cb, LV_EVENT_CLICKED, NULL);
 
-    if(track_id >= 3) {
-        lv_obj_add_state(btn, LV_STATE_DISABLED);
-    }
+    // if(track_id >= 3) {
+    //     lv_obj_add_state(btn, LV_STATE_DISABLED);
+    // }
 
     lv_obj_t * icon = lv_img_create(btn);
     lv_img_set_src(icon, &img_lv_demo_music_btn_list_play);
@@ -218,14 +222,63 @@ static lv_obj_t * add_list_btn(lv_obj_t * parent, uint32_t track_id)
     return btn;
 }
 
-
 static void btn_click_event_cb(lv_event_t * e)
 {
     lv_obj_t * btn = lv_event_get_target(e);
-
     uint32_t idx = lv_obj_get_child_id(btn);
 
-    _lv_demo_music_play(idx);
+    const char * file_path = _lv_demo_music_get_file_path(idx);
+    if (file_path) {
+        // 调用你的 MP3 播放函数
+        play_mp3(file_path);
+    }
 }
+static void* play_mp3_thread(void* arg) {
+    const char* file_path = (const char*)arg;
+
+    // 拼接完整路径
+    char full_path[256];
+    snprintf(full_path, sizeof(full_path), "/home/orangepi/gpt_x/MYmusic/%s", file_path + 2); // 去掉 "A:"
+    printf("Playing file: %s\n", full_path);
+
+    // 构建命令并执行
+    char command[256];
+    snprintf(command, sizeof(command), "mpg123 '%s'", full_path);
+    system(command);
+
+    // 释放线程传入的参数
+    free(arg);
+    return NULL;
+}
+
+void play_mp3(const char* file_path) {
+    // 为线程传递的参数分配内存
+    char* file_path_copy = strdup(file_path);
+    if (!file_path_copy) {
+        fprintf(stderr, "Failed to allocate memory for file path\n");
+        return;
+    }
+
+    // 创建线程
+    pthread_t thread;
+    int ret = pthread_create(&thread, NULL, play_mp3_thread, file_path_copy);
+    if (ret != 0) {
+        fprintf(stderr, "Failed to create thread: %s\n", strerror(ret));
+        free(file_path_copy);
+        return;
+    }
+
+    // 分离线程（自动回收资源）
+    pthread_detach(thread);
+}
+
+// static void btn_click_event_cb(lv_event_t * e)
+// {
+//     lv_obj_t * btn = lv_event_get_target(e);
+
+//     uint32_t idx = lv_obj_get_child_id(btn);
+
+//     _lv_demo_music_play(idx);
+// }
 #endif /*LV_USE_DEMO_MUSIC*/
 
