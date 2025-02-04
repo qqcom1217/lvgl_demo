@@ -243,7 +243,7 @@ static void* play_mp3_thread(void* arg) {
 
     // 构建命令并执行
     char command[256];
-    snprintf(command, sizeof(command), "mpg123 '%s'", full_path);
+    snprintf(command, sizeof(command), "mpg123 -a hw:0,0 '%s'", full_path);
     system(command);
 
     // 释放线程传入的参数
