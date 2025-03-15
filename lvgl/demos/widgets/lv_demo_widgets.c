@@ -18,6 +18,7 @@
 #include "lvgl/examples/lv_examples.h"
 #include "lv_lib_png/lv_png.h"
 #include "lvgl/lvgl.h"
+#include <pthread.h>
 
 //LV_IMG_DECLARE(mm);
 //LV_IMG_DECLARE(background);  // 声明 background 变量
@@ -80,6 +81,8 @@ static void event_handler(lv_event_t * e);
 static void hide_gif_event_cb(lv_event_t* e);
 static void my_btn_event_cb(lv_event_t * e);
 void my_example_button_gif_1(void);
+void* run_script(void* arg);
+static void btn_event_cb(lv_event_t * e);
 
 //void gif_1(void);
 // 全局变量，用于存储输入框内容
@@ -278,7 +281,7 @@ static void send_message_event_cb(lv_event_t * e) {
         printf("Error: Message is empty.\n");
         return;
     }
-
+    lv_textarea_set_text(chat_log, ""); // 清空文本区域
     // 调试信息
     lv_textarea_add_text(chat_log, "Debug: Sending message to server...\n");
     printf("Debug: Sending message to server...\n");
@@ -307,7 +310,7 @@ static void send_message_event_cb(lv_event_t * e) {
     send(sock, user_message_buffer, strlen(user_message_buffer), 0);
 
     // 接收 AI 响应
-    char buffer[1024];
+    char buffer[2048];
     int bytes_received = recv(sock, buffer, sizeof(buffer) - 1, 0);
     if (bytes_received > 0) {
         buffer[bytes_received] = '\0';  // 添加字符串结束符
@@ -328,10 +331,17 @@ static void my_btn_event_cb(lv_event_t * e)
     lv_event_code_t code = lv_event_get_code(e);
     
     if(code == LV_EVENT_CLICKED) {
+        // 创建新的线程来运行脚本
+        pthread_t thread_id;
+        pthread_create(&thread_id, NULL, run_script, NULL); // 启动线程
+
+        // 创建并显示 GIF 或其他元素
         lv_obj_t * img = gif_1();
         lv_obj_add_event_cb(img, hide_gif_event_cb, LV_EVENT_CLICKED, NULL);
     }
 }
+
+
 
 /**
  * 创建一个带标签的按钮，并在点击时调用 gif_1 函数。
@@ -356,6 +366,23 @@ static void hide_gif_event_cb(lv_event_t* e)
     lv_obj_del(img);  // 点击后删除 GIF 对象
     my_example_button_gif_1();
     printf("GIF has been hidden\n"); // 测试打印，确认事件触发
+}
+// 线程执行的函数
+void* run_script(void* arg) {
+    printf("Starting server in a new thread...\n");
+
+    // 执行 gpt.sh 脚本来启动服务器
+    system("bash ~/Desktop/gpt.sh");
+
+    return NULL;
+}
+static void btn_event_cb(lv_event_t * e) {
+    lv_obj_t * btn = lv_event_get_target(e);
+    uint32_t index = (uint32_t) lv_obj_get_user_data(btn);  // 获取按钮编号
+
+    // 更新按钮的文本
+    lv_obj_t * label = lv_obj_get_child(btn, 0);  // 获取按钮上的标签
+    lv_label_set_text_fmt(label, "Selected Option %d", index);
 }
 
 //创建第一个页面
@@ -404,42 +431,59 @@ static void profile_create(lv_obj_t * parent) {
     lv_obj_set_scroll_snap_y(cont, LV_SCROLL_SNAP_CENTER);
     lv_obj_set_scrollbar_mode(cont, LV_SCROLLBAR_MODE_OFF);
 
-    uint32_t i;
-    for(i = 0; i < 10; i++) {   // 添加10个按钮
-        lv_obj_t * btn = lv_btn_create(cont);
-        lv_obj_set_width(btn, lv_pct(100));
+// 创建按钮并绑定事件
+uint32_t i;
+for(i = 0; i < 10; i++) {
+    lv_obj_t * btn = lv_btn_create(cont);
+    lv_obj_set_width(btn, lv_pct(100));
 
-        lv_obj_t * label = lv_label_create(btn);
-        lv_label_set_text_fmt(label, "Option %"LV_PRIu32, i);
-    }
+    // 设置按钮编号
+    lv_obj_set_user_data(btn, i);
+
+    // 创建标签并设置文本
+    lv_obj_t * label = lv_label_create(btn);
+    lv_label_set_text_fmt(label, "Option %" LV_PRIu32, i);
+
+    // 添加点击事件回调
+    lv_obj_add_event_cb(btn, btn_event_cb, LV_EVENT_CLICKED, NULL);
+}
 
     // 更新按钮位置
     lv_event_send(cont, LV_EVENT_SCROLL, NULL);
     lv_obj_scroll_to_view(lv_obj_get_child(cont, 0), LV_ANIM_OFF);
 
-    // 添加日历组件，放置在水平容器的右侧
+    // 创建日历组件，放置在水平容器的右侧
     lv_obj_t * calendar = lv_calendar_create(horizontal_container);  // 将日历添加到 horizontal_container
     lv_obj_set_size(calendar, 185, 285);
     lv_obj_add_event_cb(calendar, event_handler, LV_EVENT_ALL, NULL);
-    lv_calendar_set_today_date(calendar, 2021, 02, 23);
-    lv_calendar_set_showed_date(calendar, 2021, 02);
 
-    // Highlight 一些日期
+    // 设置显示日期为 2025 年及之后的日期
+    lv_calendar_set_today_date(calendar, 2025, 03, 02);  // 设置今天的日期为 2025年3月2日
+    lv_calendar_set_showed_date(calendar, 2025, 03);      // 设置显示的日期为 2025年3月
+
+    // 高亮一些日期（选择2025年及之后的日期）
     static lv_calendar_date_t highlighted_days[3];
-    highlighted_days[0].year = 2021;
-    highlighted_days[0].month = 02;
-    highlighted_days[0].day = 6;
-    highlighted_days[1].year = 2021;
-    highlighted_days[1].month = 02;
-    highlighted_days[1].day = 11;
-    highlighted_days[2].year = 2022;
-    highlighted_days[2].month = 02;
-    highlighted_days[2].day = 22;
-    lv_calendar_set_highlighted_dates(calendar, highlighted_days, 3);
+    highlighted_days[0].year = 2025;
+    highlighted_days[0].month = 03;
+    highlighted_days[0].day = 15;  // 设置高亮的日期为 2025年3月15日
 
+    highlighted_days[1].year = 2025;
+    highlighted_days[1].month = 04;
+    highlighted_days[1].day = 10;  // 设置高亮的日期为 2025年4月10日
+
+    highlighted_days[2].year = 2026;
+    highlighted_days[2].month = 02;
+    highlighted_days[2].day = 22;  // 设置高亮的日期为 2026年2月22日
+
+    lv_calendar_set_highlighted_dates(calendar, highlighted_days, 3);  // 设置高亮的日期
+
+    // 创建日历头部下拉框和箭头
     lv_calendar_header_dropdown_create(calendar);
     lv_calendar_header_arrow_create(calendar);
-    lv_calendar_set_showed_date(calendar, 2021, 10);
+
+    // 设置显示的日期为 2025 年 3 月
+    lv_calendar_set_showed_date(calendar, 2025, 03);
+
 
     // 创建包含输入框和发送按钮的容器
     lv_obj_t * input_container = lv_obj_create(panel1);
